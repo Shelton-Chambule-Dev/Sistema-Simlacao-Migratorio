@@ -1,6 +1,9 @@
 package model.entities;
-public  abstract  class ServicoMigratorio extends Throwable {
 
-    public abstract  void processar();
+import java.time.LocalDate;
+
+public  abstract  class ServicoMigratorio  {
+
+    public abstract  boolean processar(LocalDate emissaoPassaport, LocalDate expiracaoPassaport);
 
 }
