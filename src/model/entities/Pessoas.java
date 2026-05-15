@@ -1,7 +1,6 @@
 package model.entities;
 import javax.swing.*;
 import java.time.LocalDate;
-import java.util.Date;
 public class Pessoas  extends  ServicoMigratorio{
 
     private final String codigoDoPais = "MOZ";
@@ -9,18 +8,27 @@ public class Pessoas  extends  ServicoMigratorio{
     private int idade;
     private String sexo;
     private String nacionalidade;
-    private LocalDate dataNascimento;
+    private String dataNascimento;
     private LocalDate emissaoPassaport;
     private LocalDate expiracaoPassaport;
     private String IdentificacaoPassport;
 
-    public Pessoas(String nome, int idade, String sexo, String nacionalidade, String  dataNascimento, String IdentificacaoPassport) {
+    public Pessoas(String nome, int idade, String sexo, String nacionalidade, String  dataNascimento, String IdentificacaoPassport, String origem, String destino,LocalDate emissaoPassaport, LocalDate expiracaoPassaport) throws model.Exceptions.ServicoMigratorio {
+        super(origem,destino);
+        if(emissaoPassaport == null){
+            throw  new model.Exceptions.ServicoMigratorio("A emissao do Passaport esta vazio");
+        }
+        if(expiracaoPassaport == null){
+            throw  new model.Exceptions.ServicoMigratorio("A expiracao do passaporte  esta vazio");
+        }
         this.nome = nome;
         this.idade = idade;
         this.sexo = sexo;
         this.nacionalidade = nacionalidade;
-        this.dataNascimento = LocalDate.parse(dataNascimento);
+        this.dataNascimento =dataNascimento;
         this.IdentificacaoPassport = IdentificacaoPassport;
+        this.emissaoPassaport = emissaoPassaport;
+        this.expiracaoPassaport = expiracaoPassaport;
     }
     public String getIdentificacaoPassport() {
         return IdentificacaoPassport;
@@ -52,10 +60,10 @@ public class Pessoas  extends  ServicoMigratorio{
     public void setNacionalidade(String nacionalidade) {
         this.nacionalidade = nacionalidade;
     }
-    public LocalDate getDataNascimento() {
+    public String  getDataNascimento() {
         return dataNascimento;
     }
-    public void setDataNascimento(LocalDate dataNascimento) {
+    public void setDataNascimento(String  dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
     public LocalDate getEmissaoPassaport() {
@@ -73,28 +81,27 @@ public class Pessoas  extends  ServicoMigratorio{
 
         // Metodo para fazer a validacao
     @Override
-    public boolean processar(LocalDate emissaoPassaport, LocalDate expiracaoPassaport)  {
+    public boolean processar() throws model.Exceptions.ServicoMigratorio {
         LocalDate now =  LocalDate.now();
                 if(getIdentificacaoPassport().length() > 10 ){
-                    JOptionPane.showMessageDialog(null,"Erro: a identificacao do passaporte deve ter no maximo 10 caracteres");
+                    throw  new model.Exceptions.ServicoMigratorio("Erro: a identificacao do passaporte deve ter no maximo 10 caracteres");
                 }
                 if( getIdentificacaoPassport().length() < 10){
-                    JOptionPane.showMessageDialog(null,"Erro: a identificacao do passaporte deve ter no maximo 10 caracteres");
+                    throw  new model.Exceptions.ServicoMigratorio("Erro: a identificacao do passaporte deve ter no maximo 10 caracteres");
                 }
-        if (emissaoPassaport.isAfter(now)) {
-            JOptionPane.showMessageDialog(null, "data da emissao invalida , esta no futuro");
-            return false;
+        if (getEmissaoPassaport().isAfter(now)) {
+            throw new model.Exceptions.ServicoMigratorio("data da emissao invalida , esta no futuro");
         }
-        if (!expiracaoPassaport.isAfter(emissaoPassaport)) {
+        if (!getExpiracaoPassaport().isAfter(getEmissaoPassaport())) {
             JOptionPane.showMessageDialog(null, "A data de  expiracao deve ser depois da emissao do passaport");
             return false;
         }
-        if (now.isBefore(emissaoPassaport) || now.isAfter(expiracaoPassaport)) {
-            JOptionPane.showMessageDialog(null, "Passapaort expirado, nao esta valido para a data atual");
+        if (now.isBefore(getEmissaoPassaport()) || now.isAfter(getExpiracaoPassaport())) {
+           JOptionPane.showMessageDialog(null, "Passaporte expirado, nao esta valido para a data atual");
             return false;
         } else {
-            JOptionPane.showInputDialog(null,"Nome: "+nome+"\n"+"Idade: "+"\n"+"Sexo: "+sexo+"\n"+"Nacionalidade: "+nacionalidade+"\n"
-                    +"Data Nascimento: "+dataNascimento+"\n"+"Emissao: "+emissaoPassaport+"\n"+"Expiracao: "+expiracaoPassaport+"Codigo do Pais: "+codigoDoPais,"SERVICO NACIONAL DE MIGRACAO",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null,"Nome: "+nome+"\n"+"Idade: "+idade+"\n"+"Sexo: "+sexo+"\n"+"Nacionalidade: "+nacionalidade+"\n"
+                    +"Data Nascimento: "+dataNascimento+"\n"+"Emissao: "+emissaoPassaport+"\n"+"Expiracao: "+expiracaoPassaport+"\n"+"Codigo do Pais: "+codigoDoPais+"\n"+"Origem: "+getOrigem()+"\n"+"Destino: "+getDestino(),"SERVICO NACIONAL DE MIGRACAO",JOptionPane.INFORMATION_MESSAGE);
             return true;
         }
     }
